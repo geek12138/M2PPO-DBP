@@ -6,91 +6,6 @@ Official implementation of the paper:
 > "M²PPO-DBP: Local Mean-Field Multi-Agent Proximal Policy Optimization with density-based punishment for spatial public goods games."
 > Chaos, Solitons and Fractals, 211 (2026) 118851.
 
----
-
-## Overview
-
-Irrigation networks require collective cooperation, yet farmers rely mainly on
-limited local information. Local decisions often neglect system-level needs,
-while global coordination cannot fully capture local heterogeneity.
-
-This work bridges the gap between localized perception and macro-level
-coordination by combining **LMF observations** with **centralized value
-evaluation**. **DBP** penalizes defectors based on their local density: isolated
-defectors receive a baseline penalty, while clustered ones face stronger
-suppression, without affecting cooperators.
-
-**Key results.** M²PPO-DBP lowers the cooperation threshold (from about r = 5.0
-down to r = 4.0), smooths the phase transition, and sustains cooperation from
-all-defector initial states, compared with PPO, MAPPO, LMFPPO, Q-learning and the
-Fermi update rule.
-
----
-
-## Method
-
-### Spatial public goods game (SPGG)
-
-A two-dimensional periodic lattice of size L x L with periodic boundaries. Each
-agent interacts with its four von Neumann neighbors and participates in K = 5
-overlapping public goods groups (its own group plus groups centered on each
-neighbor). Group payoff with enhancement factor r, where N_C^g is the number of
-cooperators in group g:
-
-```
-Pi_i^g = r * N_C^g / 5 - 1   if s_i = C
-Pi_i^g = r * N_C^g / 5       if s_i = D
-```
-
-The accumulated payoff of agent i is the sum over all groups containing i:
-`Pi_i = sum_{g in K_i} Pi_i^g`.
-
-### M²PPO (local mean-field MAPPO)
-
-Each agent conditions its policy on a 4-dimensional local state vector, while
-the centralized critic estimates a scalar team value from the global lattice
-state (CTDE).
-
-LMF metric (excluding the focal agent itself) and the local state vector:
-
-```
-mu_i = (n_i - 1{s_i = C}) / 4
-x_i^t = [ s_i^t, n_i^t, g_t, mu_i^t ]  in R^4
-```
-
-- `s_i^t` current strategy in {C, D}
-- `n_i^t` number of cooperators in neighborhood N(i)
-- `g_t` global cooperation fraction
-- `mu_i^t` local mean-field (neighborhood cooperation level)
-
-Actors are fully decentralized; each agent acts only on `x_i^t`. The joint
-objective optimizes the actor theta and centralized critic phi:
-
-```
-L_Total(theta, phi) = E[ L_CLIP(theta) + delta * L_VF(phi) - rho * L_ENT(theta) ]
-```
-
-The centralized critic takes the flattened global lattice state as input and
-directly drives PPO updates of the shared Actor-Critic parameters.
-
-### M²PPO-DBP (density-based punishment)
-
-DBP penalizes defectors based on the local density of defectors in an extended
-Moore neighborhood (8 neighbors, excluding the focal agent), leaving cooperators
-untouched. Let `n_D^moore(i)` be
-
-```
-R_punish^i = -p * 1{s_i = D} * ( n_D^moore(i) / 8 + 1 )
-R_i^t = Pi_i + R_punish^i
-```
-
-The total immediate reward combines the SPGG payoff with the DBP penalty. An
-isolated defector (n_D = 0) receives `-p`, while a defector fully surrounded by
-defectors (n_D = 8) receives `-2p`. This density-dependent cost discourages
-defector clustering and promotes smooth phase transitions.
-
----
-
 ## Repository structure
 
 | File | Description |
@@ -225,8 +140,4 @@ If you use this code, please cite:
 Released for academic and research purposes.
 
 ## Contact
-
-- Jinshuo Yang - gs_jysyang25@gzu.edu.cn
 - Zhaoqilin Yang - zqlyang@gzu.edu.cn
-- Wenjie Zhou - gs_wjzhou25@gzu.edu.cn
-- Youliang Tian - yltian@gzu.edu.cn
