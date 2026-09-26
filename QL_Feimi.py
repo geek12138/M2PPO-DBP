@@ -231,7 +231,7 @@ class SPGG_Qlearning(nn.Module):
         mean_of_positive_elements = (value_tensor.to(torch.float32).sum()) / ((positive_num + negetive_num).sum())
         return mean_of_positive_elements.to("cpu")
 
-    async def shot_pic(self, type_t_matrix, epoch, r, profit_data,num):
+    def shot_pic(self, type_t_matrix, epoch, r, profit_data,num):
         """保存策略矩阵快照与数据文件（与原Q-learning代码相同格式）"""
         plt.clf()
         plt.close("all")
@@ -506,19 +506,6 @@ class SPGG_Qlearning(nn.Module):
             print(D_q_mean_matrix,C_q_mean_matrix)
             self.save_data('D_Qtable', 'D_Qtable',self.r, str(i), D_q_mean_matrix)
             self.save_data('C_Qtable', 'C_Qtable',self.r, str(i), C_q_mean_matrix)
-
-    # # 早期激励，在前1000步增加合作奖励
-    # def early_stage_bonus(self, payoff,epoch):
-    #     if epoch < 1000:
-    #         payoff[:,0] += 2.0  # 给合作者额外奖励
-    #     return payoff
-    
-    # # 随机突变，在每100步执行随机突变
-    # def mutation(self,type_t_matrix,epoch):
-    #     if epoch % 100 == 0:
-    #         mutate_mask = torch.rand_like(type_t_matrix) < 0.001
-    #         type_t_matrix[mutate_mask] = 1 - type_t_matrix[mutate_mask]  # 翻转策略
-    #         self.q_table[mutate_mask] = torch.rand(2, device=self.device) * 3  # 重置Q表
     def run(self, num):
         # 初始化类型矩阵和Q表
         if self.question==1:
@@ -543,7 +530,7 @@ class SPGG_Qlearning(nn.Module):
             d_matrix, c_matrix, profit_matrix, -1)  # i=-1 表示初始步
         
         # 保存初始状态快照
-        asyncio.create_task(self.shot_pic(type_t_matrix, 0, self.r, profit_matrix, num))
+        self.shot_pic(type_t_matrix, 0, self.r, profit_matrix, num)
         # =========================================
 
         for i in tqdm(range(self.epoches)):
@@ -556,7 +543,7 @@ class SPGG_Qlearning(nn.Module):
             
             # 保存关键步的快照（修改判断条件）
             if i+1 in [1, 10, 100, 1000, 10000, 100000]:
-                asyncio.create_task(self.shot_pic(type_t_matrix, i+1, self.r, profit_matrix, num))
+                self.shot_pic(type_t_matrix, i+1, self.r, profit_matrix, num)
             
             # Q-learning策略更新
             type_t1_matrix = self.type_matrix_change(self.epsilon, type_t_matrix, Q_matrix)

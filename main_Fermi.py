@@ -46,7 +46,7 @@ async def main(args):
     formatted_time = current_time.strftime("%Y_%m_%d_%H%M%S")
     # 实验参数设置
     fontsize=16
-    r_values = [round(i * 0.1, 1) for i in range(25, 56)]
+    r_values = [round(i * 0.1, 1) for i in range(30, 60)]
     # 使用 arange 生成从 1 到 6 的列表，间隔为 0.1
     # r_values = [round(i * 0.1, 1) for i in range(45, 56)]
     # r_values = [round(i * 0.1, 1) for i in range(30, 61)]

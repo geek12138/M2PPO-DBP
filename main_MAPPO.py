@@ -237,7 +237,7 @@ if __name__ == "__main__":
 
     # 添加args参数
     # parser.add_argument('-r', type=float, default=0.5, help='R parameter')
-    parser.add_argument('-epochs', type=int, default=10000, help='Epochs')
+    parser.add_argument('-epochs', type=int, default=1000, help='Epochs')
     parser.add_argument('-runs', type=int, default=1, help='Runs')
     parser.add_argument('-L_num', type=int, default=200, help='question size')
     parser.add_argument('-alpha', type=float, default=1e-2, help='learning rate')

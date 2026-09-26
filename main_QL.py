@@ -42,14 +42,12 @@ def save_params_to_json(params, filename_prefix="params",output_path='data'):
     print(f"参数已保存至: {filepath}")
 
 # 主实验程序
-async def main(args):
+def main(args):
     current_time = datetime.now()
     formatted_time = current_time.strftime("%Y_%m_%d_%H%M%S")
     # 实验参数设置
     fontsize=16
-    # r_values = [4.7]#[4.5,4.6,4.7,4.8,4.9,5.0,5.1]#[3.6, 3.8, 4.7, 5.0, 5.5, 6.0] #[3.0, 5.0, 7.0, 9.0]  # 公共物品乘数
-    # 使用 arange 生成从 1 到 6 的列表，间隔为 0.1
-    r_values = [round(i * 0.1, 1) for i in range(25, 56)]
+    r_values = [round(i * 0.1, 1) for i in range(30, 60)]
     # print(result_list)
 
     if args.device=='cuda':
@@ -272,4 +270,4 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(args.seed)
 
     # args.seed=seed
-    asyncio.run(main(args))
+    main(args)
